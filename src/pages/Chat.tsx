@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../AuthContext';
 
@@ -8,7 +8,7 @@ const Chat = () => {
   const [messages, setMessages] = useState<{ sender: 'user' | 'agent'; text: string; subtitle?: string; isInitial?: boolean }[]>([]);
   const [input, setInput] = useState('');
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const { token, logout } = useAuth();
+  const { logout } = useAuth();
 
   // Add initial messages on component mount
   useEffect(() => {
