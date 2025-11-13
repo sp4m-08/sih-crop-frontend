@@ -17,7 +17,8 @@ interface PriceEntry {
   "Min Price": string | number;
   "Max Price": string | number;
   "Modal Price": string | number;
-  [key: string]: any; // Use index signature for flexibility with API
+  // This index signature prevents the TS2339 'never' error when accessing properties dynamically
+  [key: string]: any; 
 }
 
 const initialFormData: ProfileData = {
@@ -28,12 +29,14 @@ const initialFormData: ProfileData = {
 };
 
 const Profile = () => {
+  // Explicitly typing state fixes TS2345 for originalData
   const [formData, setFormData] = useState<ProfileData>(initialFormData);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
   const [originalData, setOriginalData] = useState<ProfileData>(initialFormData); 
+  // Explicitly typing state array fixes TS2339 'never' errors for priceData properties
   const [priceData, setPriceData] = useState<PriceEntry[]>([]); 
   const [loadingPrices, setLoadingPrices] = useState(false);
 
@@ -76,6 +79,7 @@ const Profile = () => {
         let state = data.state || "";
         
         if (!city && !state && data.location) {
+          // Explicitly typing 'part' as string fixes TS7006: Parameter 'part' implicitly has an 'any' type. (Line 58 in previous error report)
           const locationParts = data.location.split(',').map((part: string) => part.trim()); 
           city = locationParts[0] || "";
           state = locationParts[1] || "";
@@ -130,6 +134,7 @@ const Profile = () => {
     }
   };
 
+  // Explicitly typing 'e' as React.ChangeEvent<HTMLInputElement> fixes TS7006: Parameter 'e' implicitly has an 'any' type. (Line 112 in previous error report)
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
