@@ -1,20 +1,41 @@
-import { useState, useEffect } from "react";
-import Sidebar from "../components/Sidebar";
-import { Edit2, Save, X, MapPin, Wheat, Maximize2, TrendingUp, IndianRupee, Calendar, RefreshCw, Map } from "lucide-react";
+import React, { useState, useEffect } from "react";
+// Import now points to the created file in src/components/Sidebar.tsx
+import Sidebar from "../components/Sidebar"; 
+import { Edit2, Save, X, MapPin, Wheat, Maximize2, TrendingUp, IndianRupee, Calendar, RefreshCw, Map, User, Home, Zap } from "lucide-react";
+
+// --- Type Definitions ---
+
+interface ProfileData {
+  city: string;
+  state: string;
+  preferredCrop: string;
+  farmSizeAcres: string;
+}
+
+interface PriceEntry {
+  Date: string;
+  Variety: string;
+  "Min Price": string | number;
+  "Max Price": string | number;
+  "Modal Price": string | number;
+  [key: string]: any; // Use index signature for flexibility with API
+}
+
+const initialFormData: ProfileData = {
+  city: "",
+  state: "",
+  preferredCrop: "",
+  farmSizeAcres: "",
+};
 
 const Profile = () => {
-  const [formData, setFormData] = useState({
-    city: "",
-    state: "",
-    preferredCrop: "",
-    farmSizeAcres: "",
-  });
+  const [formData, setFormData] = useState<ProfileData>(initialFormData);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
-  const [originalData, setOriginalData] = useState({});
-  const [priceData, setPriceData] = useState([]);
+  const [originalData, setOriginalData] = useState<ProfileData>(initialFormData); 
+  const [priceData, setPriceData] = useState<PriceEntry[]>([]); 
   const [loadingPrices, setLoadingPrices] = useState(false);
 
   const API_URL = "https://sih-crop-backend-3sjd.onrender.com/api/profile";
@@ -55,12 +76,12 @@ const Profile = () => {
         let state = data.state || "";
         
         if (!city && !state && data.location) {
-          const locationParts = data.location.split(',').map(part => part.trim());
+          const locationParts = data.location.split(',').map((part: string) => part.trim()); 
           city = locationParts[0] || "";
           state = locationParts[1] || "";
         }
         
-        const profileData = {
+        const profileData: ProfileData = {
           city,
           state,
           preferredCrop: data.preferredCrop || "",
@@ -86,7 +107,7 @@ const Profile = () => {
     try {
       // Capitalize crop name for API
       const commodity = formData.preferredCrop.charAt(0).toUpperCase() + 
-                       formData.preferredCrop.slice(1).toLowerCase();
+                        formData.preferredCrop.slice(1).toLowerCase();
 
       const url = `${PRICE_API_URL}?commodity=${encodeURIComponent(commodity)}&state=${encodeURIComponent(formData.state)}&market=${encodeURIComponent(formData.city)}`;
       
@@ -95,7 +116,7 @@ const Profile = () => {
       const response = await fetch(url);
       
       if (response.ok) {
-        const data = await response.json();
+        const data: PriceEntry[] = await response.json();
         setPriceData(data.slice(0, 5)); // Get latest 5 entries
       } else {
         console.error("Failed to fetch price data");
@@ -109,7 +130,7 @@ const Profile = () => {
     }
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -123,7 +144,7 @@ const Profile = () => {
   };
 
   const handleCancel = () => {
-    setFormData(originalData);
+    setFormData(originalData); 
     setIsEditing(false);
     setMessage({ text: "", type: "" });
   };
@@ -152,7 +173,7 @@ const Profile = () => {
           state: formData.state,
           location: `${formData.city}, ${formData.state}`, // Send combined for backward compatibility
           preferredCrop: formData.preferredCrop,
-          farmSizeAcres: Number(formData.farmSizeAcres),
+          farmSizeAcres: Number(formData.farmSizeAcres) || 0, 
         }),
       });
 
@@ -330,7 +351,7 @@ const Profile = () => {
                         onChange={handleChange}
                         placeholder="e.g., potato, rice, wheat, onion"
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                        required
+                          required
                       />
                     </div>
 
@@ -366,7 +387,8 @@ const Profile = () => {
                         {saving ? "Saving..." : "Save Changes"}
                       </button>
                       
-                      {formData.city && (
+                      {/* Only show Cancel button if profile data was previously loaded */}
+                      {originalData.city && ( 
                         <button
                           onClick={handleCancel}
                           disabled={saving}
@@ -428,6 +450,7 @@ const Profile = () => {
                 ) : (
                   <div className="space-y-3">
                     {priceData.map((price, index) => (
+                      // Price properties are now correctly typed due to PriceEntry interface
                       <div key={index} className="border border-gray-200 rounded-lg p-3 hover:shadow-md transition-shadow">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
