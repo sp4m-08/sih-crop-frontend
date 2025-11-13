@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-// Import now points to the created file in src/components/Sidebar.tsx
 import Sidebar from "../components/Sidebar"; 
-import { Edit2, Save, X, MapPin, Wheat, Maximize2, TrendingUp, IndianRupee, Calendar, RefreshCw, Map, User, Home, Zap } from "lucide-react";
+import { Edit2, Save, X, MapPin, Wheat, Maximize2, TrendingUp, IndianRupee, Calendar, RefreshCw, Map } from "lucide-react";
 
 // --- Type Definitions ---
 
@@ -46,6 +45,7 @@ const Profile = () => {
   }, []);
 
   useEffect(() => {
+    // Only fetch prices if we have complete data and are not in edit mode
     if (formData.city && formData.state && formData.preferredCrop && !isEditing) {
       fetchPriceData();
     }
@@ -450,7 +450,6 @@ const Profile = () => {
                 ) : (
                   <div className="space-y-3">
                     {priceData.map((price, index) => (
-                      // Price properties are now correctly typed due to PriceEntry interface
                       <div key={index} className="border border-gray-200 rounded-lg p-3 hover:shadow-md transition-shadow">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
